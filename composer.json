@@ -1,17 +1,17 @@
 {
-    "name": "vendor_slug/package_slug",
-    "description": ":package_description",
+    "name": "r4nkt/laravel-teams",
+    "description": "An opinionated solution for competitive team structures within a game-like atmosphere.",
     "keywords": [
-        ":vendor_name",
+        "r4nkt",
         "laravel",
-        "package_slug"
+        "laravel-teams"
     ],
-    "homepage": "https://github.com/vendor_slug/package_slug",
+    "homepage": "https://github.com/r4nkt/laravel-teams",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": "author@domain.com",
+            "name": "Travis Elkins",
+            "email": "travis.elkins+github@gmail.com",
             "role": "Developer"
         }
     ],
@@ -30,13 +30,13 @@
     },
     "autoload": {
         "psr-4": {
-            "VendorName\\Skeleton\\": "src",
-            "VendorName\\Skeleton\\Database\\Factories\\": "database/factories"
+            "R4nkt\\Teams\\": "src",
+            "R4nkt\\Teams\\Database\\Factories\\": "database/factories"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "VendorName\\Skeleton\\Tests\\": "tests"
+            "R4nkt\\Teams\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -50,10 +50,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "VendorName\\Skeleton\\SkeletonServiceProvider"
+                "R4nkt\\Teams\\TeamsServiceProvider"
             ],
             "aliases": {
-                "Skeleton": "VendorName\\Skeleton\\SkeletonFacade"
+                "Teams": "R4nkt\\Teams\\TeamsFacade"
             }
         }
     },

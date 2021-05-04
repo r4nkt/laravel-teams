@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace R4nkt\Teams\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class TeamsCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'laravel-teams';
 
     public $description = 'My command';
 
