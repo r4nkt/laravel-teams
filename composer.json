@@ -36,7 +36,9 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "R4nkt\\Teams\\Tests\\": "tests"
+            "App\\Providers\\": "stubs",
+            "R4nkt\\Teams\\Tests\\": "tests",
+            "R4nkt\\Teams\\Tests\\Database\\Factories\\": "tests/database/factories"
         }
     },
     "scripts": {
