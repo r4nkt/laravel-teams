@@ -158,13 +158,13 @@ $invitation = $team->invite($person);
 Using the Teams facade:
 
 ```php
-Teams::acceptTeamInvitation($invitation);
+Teams::acceptInvitation($invitation);
 ```
 
 Or, if you use a model that uses `HasTeams`:
 
 ```php
-$person->acceptTeamInvitation($invitation);
+$person->acceptInvitation($invitation);
 ```
 
 Or, using the invitation itself:
@@ -178,13 +178,13 @@ $invitation->accept();
 Using the Teams facade:
 
 ```php
-Teams::rejectTeamInvitation($invitation);
+Teams::rejectInvitation($invitation);
 ```
 
 Or, if you use a model that uses `HasTeams`:
 
 ```php
-$person->rejectTeamInvitation($invitation);
+$person->rejectInvitation($invitation);
 ```
 
 Or, using the invitation itself:
@@ -198,13 +198,13 @@ $invitation->reject();
 Using the Teams facade:
 
 ```php
-Teams::deleteTeamInvitation($invitation);
+Teams::deleteInvitation($invitation);
 ```
 
 Or, if you use a model that uses `HasTeams`:
 
 ```php
-$person->deleteTeamInvitation($invitation);
+$person->deleteInvitation($invitation);
 ```
 
 Or, using the invitation itself:

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 use R4nkt\Teams\Models\Team;
-use R4nkt\Teams\Models\TeamInvitation;
+use R4nkt\Teams\Models\Invitation;
 
 interface BelongsToTeam
 {
@@ -43,17 +43,17 @@ interface BelongsToTeam
     /**
      * Determine if the user owns the given invitation team.
      */
-    public function ownsInvitationTeam(TeamInvitation $invitation);
+    public function ownsInvitationTeam(Invitation $invitation);
 
     /**
      * Determine if the user is the inviter for the given invitation.
      */
-    public function isInviter(TeamInvitation $invitation);
+    public function isInviter(Invitation $invitation);
 
     /**
      * Determine if the user is the invitee for the given invitation.
      */
-    public function isInvitee(TeamInvitation $invitation);
+    public function isInvitee(Invitation $invitation);
 
     /**
      * Determine if the user belongs to the given team.

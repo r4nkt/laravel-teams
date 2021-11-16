@@ -9,16 +9,16 @@ use Illuminate\Validation\Rule;
 use R4nkt\Teams\Contracts\BelongsToTeam;
 use R4nkt\Teams\Contracts\InvitesTeamMembers;
 use R4nkt\Teams\Models\Team;
-use R4nkt\Teams\Models\TeamInvitation;
+use R4nkt\Teams\Models\Invitation;
 
 class InviteTeamMember implements InvitesTeamMembers
 {
     /**
      * Invite a new team member to the given team.
      */
-    public function invite(BelongsToTeam $inviter, Team $team, BelongsToTeam $invitee, ?array $attributes = null): TeamInvitation
+    public function invite(BelongsToTeam $inviter, Team $team, BelongsToTeam $invitee, ?array $attributes = null): Invitation
     {
-        Gate::forUser($inviter)->authorize('create', [TeamInvitation::class, $team, $invitee, $attributes]);
+        Gate::forUser($inviter)->authorize('create', [Invitation::class, $team, $invitee, $attributes]);
 
         $this->validate($team, $invitee, $attributes);
 
@@ -43,11 +43,11 @@ class InviteTeamMember implements InvitesTeamMembers
     {
         Validator::make([
             'team_id' => $team->getKey(),
-            'invitee_id' => $invitee->getKey(),
+            'invitee' => $invitee->getKey(),
             'attributes' => $attributes,
             'role' => $attributes['role'] ?? null,
         ], $this->rules($team, $attributes), [
-            'invitee_id.unique' => __('This member has already been invited to the team.'),
+            'invitee.unique' => __('This member has already been invited to the team.'),
         ])->after(
             $this->ensureMemberIsNotAlreadyOnTeam($team, $invitee)
         )->validateWithBag('inviteTeamMember');
@@ -59,9 +59,12 @@ class InviteTeamMember implements InvitesTeamMembers
     protected function rules(Team $team, ?array $attributes): array
     {
         return array_filter([
-            'invitee_id' => ['required', 'int', Rule::unique('team_invitations')->where(function ($query) use ($team) {
-                $query->where('team_id', $team->getKey());
-            })],
+            'invitee' => [
+                'required',
+                'int',
+                Rule::unique('team_invitations', 'invitee_id')
+                    ->where(fn ($query) => $query->where('team_id', $team->getKey())),
+            ],
             'attributes' => ['nullable', 'array'],
             'role' => ($attributes && array_key_exists('role', $attributes)) ? ['string'] : null,
         ]);
@@ -75,7 +78,7 @@ class InviteTeamMember implements InvitesTeamMembers
         return function ($validator) use ($invitee, $team) {
             $validator->errors()->addIf(
                 $team->hasMember($invitee),
-                'invitee_id',
+                'invitee',
                 __('This member already belongs to the team.')
             );
         };

@@ -97,7 +97,7 @@ class InviteTeamMemberTest extends TestCase
         try {
             Teams::inviteTeamMember($owner, $team, $prospect);
         } catch (ValidationException $e) {
-            $this->assertArrayHasKey('invitee_id', $e->errors());
+            $this->assertArrayHasKey('invitee', $e->errors());
 
             // Inviter, invitee, and team
             $this->assertSame(1, $owner->sentInvitations()->count());
@@ -127,7 +127,7 @@ class InviteTeamMemberTest extends TestCase
         try {
             Teams::inviteTeamMember($owner, $team, $teamMember);
         } catch (ValidationException $e) {
-            $this->assertArrayHasKey('invitee_id', $e->errors());
+            $this->assertArrayHasKey('invitee', $e->errors());
 
             // Inviter, invitee, and team
             $this->assertSame(0, $owner->sentInvitations()->count());

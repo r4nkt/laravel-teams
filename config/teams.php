@@ -8,6 +8,6 @@ return [
 
     'membership_model' => 'R4nkt\\Teams\\Models\\Membership',
 
-    'teaminvitation_model' => 'R4nkt\\Teams\\Models\\TeamInvitation',
+    'invitation_model' => 'R4nkt\\Teams\\Models\\Invitation',
 
 ];

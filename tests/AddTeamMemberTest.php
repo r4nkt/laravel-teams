@@ -86,7 +86,7 @@ class AddTeamMemberTest extends TestCase
 
             Teams::addTeamMember($owner, $team, $player);
         } catch (ValidationException $e) {
-            $this->assertArrayHasKey('member_id', $e->errors());
+            $this->assertArrayHasKey('member', $e->errors());
 
             // Team functionality
             $this->assertFalse($team->allMembers()->contains($player));
@@ -126,7 +126,7 @@ class AddTeamMemberTest extends TestCase
 
             Teams::addTeamMember($owner, $team, $player);
         } catch (ValidationException $e) {
-            $this->assertArrayHasKey('member_id', $e->errors());
+            $this->assertArrayHasKey('member', $e->errors());
 
             // Team functionality
             $this->assertTrue($team->allMembers()->contains($player));

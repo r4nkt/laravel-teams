@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 use R4nkt\Teams\Models\Membership;
 use R4nkt\Teams\Models\Team;
-use R4nkt\Teams\Models\TeamInvitation;
+use R4nkt\Teams\Models\Invitation;
 use R4nkt\Teams\Teams;
 
 trait HasTeams
@@ -51,7 +51,7 @@ trait HasTeams
     /**
      * Determine if the user owns the given invitation team.
      */
-    public function ownsInvitationTeam(TeamInvitation $invitation)
+    public function ownsInvitationTeam(Invitation $invitation)
     {
         return $this->getKey() == $invitation->team->owner_id;
     }
@@ -59,7 +59,7 @@ trait HasTeams
     /**
      * Determine if the user is the inviter for the given invitation.
      */
-    public function isInviter(TeamInvitation $invitation)
+    public function isInviter(Invitation $invitation)
     {
         return $this->getKey() == $invitation->inviter_id;
     }
@@ -67,7 +67,7 @@ trait HasTeams
     /**
      * Determine if the user is the invitee for the given invitation.
      */
-    public function isInvitee(TeamInvitation $invitation)
+    public function isInvitee(Invitation $invitation)
     {
         return $this->getKey() == $invitation->invitee_id;
     }
@@ -96,7 +96,7 @@ trait HasTeams
      */
     public function receivedInvitations(): HasMany
     {
-        return $this->hasMany(TeamInvitation::class, 'invitee_id');
+        return $this->hasMany(Invitation::class, 'invitee_id');
     }
 
     /**
@@ -104,6 +104,6 @@ trait HasTeams
      */
     public function sentInvitations(): HasMany
     {
-        return $this->hasMany(TeamInvitation::class, 'inviter_id');
+        return $this->hasMany(Invitation::class, 'inviter_id');
     }
 }

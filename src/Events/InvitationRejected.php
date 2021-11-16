@@ -3,13 +3,13 @@
 namespace R4nkt\Teams\Events;
 
 use R4nkt\Teams\Contracts\BelongsToTeam;
-use R4nkt\Teams\Models\TeamInvitation;
+use R4nkt\Teams\Models\Invitation;
 
-class TeamInvitationRevoked extends TeamInvitationEvent
+class InvitationRejected extends InvitationEvent
 {
     public function __construct(
-        TeamInvitation $invitation,
-        public BelongsToTeam $revoker,
+        Invitation $invitation,
+        public BelongsToTeam $invokedBy,
     )
     {
         parent::__construct($invitation);

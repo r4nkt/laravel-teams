@@ -42,7 +42,7 @@ class TestCase extends Orchestra
         (new \CreateMemberTeamTable())->up();
 
         include_once __DIR__.'/../database/migrations/create_team_invitations_table.php.stub';
-        (new \CreateTeamInvitationsTable())->up();
+        (new \CreateInvitationsTable())->up();
 
         include_once __DIR__.'/database/migrations/create_players_table.php';
         (new \CreatePlayersTable())->up();

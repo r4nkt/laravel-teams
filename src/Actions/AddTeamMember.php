@@ -11,6 +11,7 @@ use R4nkt\Teams\Contracts\BelongsToTeam;
 use R4nkt\Teams\Events\AddingTeamMember;
 use R4nkt\Teams\Events\TeamMemberAdded;
 use R4nkt\Teams\Models\Team;
+use R4nkt\Teams\Teams;
 
 class AddTeamMember implements AddsTeamMembers
 {
@@ -38,11 +39,11 @@ class AddTeamMember implements AddsTeamMembers
     protected function validate(Team $team, BelongsToTeam $member, array $attributes): void
     {
         Validator::make([
-            'member_id' => $member->getKey(),
+            'member' => $member->getKey(),
             'attributes' => $attributes,
             'role' => $attributes['role'] ?? null,
         ], $this->rules($team, $attributes), [
-            'member_id.exists' => __('We were unable to find this member.'),
+            'member.exists' => __('We were unable to find this member.'),
         ])->after(
             $this->ensureMemberIsNotAlreadyOnTeam($team, $member)
         )->validateWithBag('addTeamMember');
@@ -55,8 +56,10 @@ class AddTeamMember implements AddsTeamMembers
      */
     protected function rules(Team $team, array $attributes)
     {
+        $memberModel = Teams::newMemberModel();
+
         return array_filter([
-            'member_id' => ['required', 'exists:players,id'],
+            'member' => ['required', "exists:{$memberModel->getTable()},{$memberModel->getKeyName()}"],
             'attributes' => ['nullable', 'array'],
             'role' => ($attributes && array_key_exists('role', $attributes)) ? ['string'] : null,
         ]);
@@ -70,8 +73,8 @@ class AddTeamMember implements AddsTeamMembers
         return function ($validator) use ($member, $team) {
             $validator->errors()->addIf(
                 $team->hasMember($member),
-                'member_id',
-                __('This member already belongs to the team.')
+                'member',
+                __('This member already belongs to the team.'),
             );
         };
     }

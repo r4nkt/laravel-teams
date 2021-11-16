@@ -2,10 +2,8 @@
 
 namespace R4nkt\Teams\Actions;
 
-use Closure;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use R4nkt\Teams\Contracts\BelongsToTeam;
 use R4nkt\Teams\Contracts\RemovesTeamMembers;
 use R4nkt\Teams\Events\RemovingTeamMember;
@@ -17,62 +15,36 @@ class RemoveTeamMember implements RemovesTeamMembers
     /**
      * Remove a member from a team.
      */
-    public function remove(BelongsToTeam $owner, Team $team, BelongsToTeam $member): void
+    public function remove(Team $team, BelongsToTeam $member, BelongsToTeam $invokedBy): void
     {
-        Gate::forUser($owner)->authorize('removeTeamMember', $team);
+        Gate::forUser($invokedBy)->authorize('removeTeamMember', $team);
 
-        // $this->validate($team, $member);
+        $this->validate($team, $member, $invokedBy);
 
-        RemovingTeamMember::dispatch($team, $member, $owner);
+        RemovingTeamMember::dispatch($team, $member, $invokedBy);
 
         $team->members()->detach($member);
 
-        TeamMemberRemoved::dispatch($team, $member, $owner);
+        TeamMemberRemoved::dispatch($team, $member, $invokedBy);
 
         $team->refresh('members');
     }
 
     /**
-     * Validate the add member operation.
+     * Validate the remove member operation.
      */
-    // protected function validate(Team $team, BelongsToTeam $member, array $attributes): void
-    // {
-    //     Validator::make([
-    //         'member_id' => $member->getKey(),
-    //         'attributes' => $attributes,
-    //         'role' => $attributes['role'] ?? null,
-    //     ], $this->rules($team, $attributes), [
-    //         'member_id.exists' => __('We were unable to find this member.'),
-    //     ])->after(
-    //         $this->ensureMemberIsNotAlreadyOnTeam($team, $member)
-    //     )->validateWithBag('addTeamMember');
-    // }
+    protected function validate(Team $team, BelongsToTeam $member, BelongsToTeam $invokedBy): void
+    {
+        if ($member->getKey() === $invokedBy->getKey()) {
+            throw ValidationException::withMessages([
+                'member' => __('One cannot remove oneself from a team.'),
+            ])->errorBag('removeTeamMember');
+        }
 
-    /**
-     * Get the validation rules for adding a team member.
-     *
-     * @return array
-     */
-    // protected function rules(Team $team, array $attributes)
-    // {
-    //     return array_filter([
-    //         'member_id' => ['required', 'exists:players,id'],
-    //         'attributes' => ['nullable', 'array'],
-    //         'role' => ($attributes && array_key_exists('role', $attributes)) ? ['string'] : null,
-    //     ]);
-    // }
-
-    // *
-    //  * Ensure that the member is not already on the team.
-
-    // protected function ensureMemberIsNotAlreadyOnTeam(Team $team, BelongsToTeam $member): Closure
-    // {
-    //     return function ($validator) use ($member, $team) {
-    //         $validator->errors()->addIf(
-    //             $team->hasMember($member),
-    //             'member_id',
-    //             __('This member already belongs to the team.')
-    //         );
-    //     };
-    // }
+        if (! $team->hasMember($member)) {
+            throw ValidationException::withMessages([
+                'member' => __('This member does not belong to the team.'),
+            ])->errorBag('removeTeamMember');
+        }
+    }
 }

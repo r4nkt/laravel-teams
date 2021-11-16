@@ -5,8 +5,8 @@ namespace R4nkt\Teams\Tests;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\ValidationException;
-use R4nkt\Teams\Events\AcceptingTeamInvitation;
-use R4nkt\Teams\Events\TeamInvitationAccepted;
+use R4nkt\Teams\Events\AcceptingInvitation;
+use R4nkt\Teams\Events\InvitationAccepted;
 use R4nkt\Teams\Models\Team;
 use R4nkt\Teams\Teams;
 use R4nkt\Teams\Tests\TestClasses\Models\Player;
@@ -18,7 +18,7 @@ use R4nkt\Teams\Tests\TestClasses\Models\Player;
  *  - accepted_at being set
  *  - ...?
  */
-class AcceptTeamInvitationTest extends TestCase
+class AcceptInvitationTest extends TestCase
 {
     /** @test */
     public function it_can_accept_a_team_invitation_if_invitee()
@@ -33,7 +33,7 @@ class AcceptTeamInvitationTest extends TestCase
 
         $invitation = Teams::inviteTeamMember($owner, $team, $prospect, $attributes);
 
-        Teams::acceptTeamInvitation($prospect, $invitation);
+        Teams::acceptInvitation($prospect, $invitation);
 
         $team->refresh();
 
@@ -56,13 +56,13 @@ class AcceptTeamInvitationTest extends TestCase
         $this->assertSame($role, $prospect->teams()->first()->membership->attributes['role']);
 
         // Events
-        Event::assertDispatched(function (AcceptingTeamInvitation $event) use ($invitation, $prospect) {
+        Event::assertDispatched(function (AcceptingInvitation $event) use ($invitation, $prospect) {
             return $event->invitation->id === $invitation->id
-                && $event->accepter->getKey() === $prospect->getKey();
+                && $event->invokedBy->getKey() === $prospect->getKey();
         });
-        Event::assertDispatched(function (TeamInvitationAccepted $event) use ($invitation, $prospect) {
+        Event::assertDispatched(function (InvitationAccepted $event) use ($invitation, $prospect) {
             return $event->invitation->id === $invitation->id
-                && $event->accepter->getKey() === $prospect->getKey();
+                && $event->invokedBy->getKey() === $prospect->getKey();
         });
     }
 
@@ -80,7 +80,7 @@ class AcceptTeamInvitationTest extends TestCase
         $this->expectException(AuthorizationException::class);
 
         try {
-            Teams::acceptTeamInvitation($nonOwner, $invitation);
+            Teams::acceptInvitation($nonOwner, $invitation);
         } catch (AuthorizationException $e) {
             $this->assertSame(1, $team->invitations()->count());
             $this->assertSame(1, $prospect->receivedInvitations()->count());
@@ -102,7 +102,7 @@ class AcceptTeamInvitationTest extends TestCase
         $this->expectException(AuthorizationException::class);
 
         try {
-            Teams::acceptTeamInvitation($owner, $invitation);
+            Teams::acceptInvitation($owner, $invitation);
         } catch (AuthorizationException $e) {
             $this->assertSame(1, $team->invitations()->count());
             $this->assertSame(1, $prospect->receivedInvitations()->count());
@@ -125,7 +125,7 @@ class AcceptTeamInvitationTest extends TestCase
         $this->expectException(AuthorizationException::class);
 
         try {
-            Teams::acceptTeamInvitation($nonTeamMember, $invitation);
+            Teams::acceptInvitation($nonTeamMember, $invitation);
         } catch (AuthorizationException $e) {
             $this->assertSame(1, $team->invitations()->count());
             $this->assertSame(1, $prospect->receivedInvitations()->count());

@@ -4,16 +4,15 @@ namespace R4nkt\Teams\Tests;
 
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Validation\ValidationException;
-use R4nkt\Teams\Events\RejectingTeamInvitation;
-use R4nkt\Teams\Events\TeamInvitationRejected;
+use R4nkt\Teams\Events\RevokingInvitation;
+use R4nkt\Teams\Events\InvitationRevoked;
 use R4nkt\Teams\Teams;
 use R4nkt\Teams\Tests\TestClasses\Models\Player;
 
-class RejectTeamInvitationTest extends TestCase
+class RevokeInvitationTest extends TestCase
 {
     /** @test */
-    public function it_can_reject_a_team_invitation_if_invitee()
+    public function it_can_revoke_a_team_invitation_if_owner()
     {
         Event::fake();
 
@@ -23,30 +22,32 @@ class RejectTeamInvitationTest extends TestCase
 
         $invitation = Teams::inviteTeamMember($owner, $team, $prospect);
 
-        Teams::rejectTeamInvitation($prospect, $invitation);
+        Teams::revokeInvitation($invitation, $owner);
 
         $this->assertSame(0, $team->invitations()->count());
         $this->assertSame(0, $prospect->receivedInvitations()->count());
         $this->assertSame(0, $owner->sentInvitations()->count());
 
         // Events
-        Event::assertDispatched(function (RejectingTeamInvitation $event) use ($invitation, $prospect) {
+        Event::assertDispatched(function (RevokingInvitation $event) use ($invitation, $owner) {
             return $event->invitation->id === $invitation->id
-                && $event->rejecter->getKey() === $prospect->getKey();
+                && $event->invokedBy->getKey() === $owner->getKey();
         });
-        Event::assertDispatched(function (TeamInvitationRejected $event) use ($invitation, $prospect) {
+        Event::assertDispatched(function (InvitationRevoked $event) use ($invitation, $owner) {
             return $event->invitation->id === $invitation->id
-                && $event->rejecter->getKey() === $prospect->getKey();
+                && $event->invokedBy->getKey() === $owner->getKey();
         });
     }
 
     /** @test */
-    public function it_cannot_reject_a_team_invitation_if_not_owner_and_not_invitee()
+    public function it_cannot_revoke_a_team_invitation_if_not_owner()
     {
         $owner = Player::factory()->create();
         $team = Teams::createTeam($owner, 'Test Team');
-        $nonOwner = Player::factory()->create();
-        Teams::addTeamMember($owner, $team, $nonOwner);
+        $inviter = Player::factory()->create();
+        Teams::addTeamMember($owner, $team, $inviter);
+        $notInviter = Player::factory()->create();
+        Teams::addTeamMember($owner, $team, $notInviter);
         $prospect = Player::factory()->create();
 
         $invitation = Teams::inviteTeamMember($owner, $team, $prospect);
@@ -54,7 +55,7 @@ class RejectTeamInvitationTest extends TestCase
         $this->expectException(AuthorizationException::class);
 
         try {
-            Teams::rejectTeamInvitation($nonOwner, $invitation);
+            Teams::revokeInvitation($invitation, $notInviter);
         } catch (AuthorizationException $e) {
             $this->assertSame(1, $team->invitations()->count());
             $this->assertSame(1, $prospect->receivedInvitations()->count());
@@ -65,29 +66,7 @@ class RejectTeamInvitationTest extends TestCase
     }
 
     /** @test */
-    public function it_cannot_reject_a_team_invitation_if_owner()
-    {
-        $owner = Player::factory()->create();
-        $team = Teams::createTeam($owner, 'Test Team');
-        $prospect = Player::factory()->create();
-
-        $invitation = Teams::inviteTeamMember($owner, $team, $prospect);
-
-        $this->expectException(AuthorizationException::class);
-
-        try {
-            Teams::rejectTeamInvitation($owner, $invitation);
-        } catch (AuthorizationException $e) {
-            $this->assertSame(1, $team->invitations()->count());
-            $this->assertSame(1, $prospect->receivedInvitations()->count());
-            $this->assertSame(1, $owner->sentInvitations()->count());
-
-            throw $e;
-        }
-    }
-
-    /** @test */
-    public function it_cannot_reject_a_team_invitation_if_not_team_member()
+    public function it_cannot_revoke_a_team_invitation_if_not_team_member()
     {
         $owner = Player::factory()->create();
         $team = Teams::createTeam($owner, 'Test Team');
@@ -99,7 +78,7 @@ class RejectTeamInvitationTest extends TestCase
         $this->expectException(AuthorizationException::class);
 
         try {
-            Teams::rejectTeamInvitation($nonTeamMember, $invitation);
+            Teams::revokeInvitation($invitation, $nonTeamMember);
         } catch (AuthorizationException $e) {
             $this->assertSame(1, $team->invitations()->count());
             $this->assertSame(1, $prospect->receivedInvitations()->count());

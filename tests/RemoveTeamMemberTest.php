@@ -4,6 +4,7 @@ namespace R4nkt\Teams\Tests;
 
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Validation\ValidationException;
 use R4nkt\Teams\Events\CreatingTeam;
 use R4nkt\Teams\Events\DeletingMembership;
 use R4nkt\Teams\Events\MembershipDeleted;
@@ -22,7 +23,7 @@ use R4nkt\Teams\Tests\TestClasses\Models\Player;
 class RemoveTeamMemberTest extends TestCase
 {
     /** @test */
-    public function it_allows_a_member_to_be_removed_from_a_team()
+    public function it_allows_a_member_to_be_removed_from_the_team()
     {
         Event::fake();
 
@@ -31,7 +32,7 @@ class RemoveTeamMemberTest extends TestCase
         $player = Player::factory()->create();
         Teams::addTeamMember($owner, $team, $player);
 
-        Teams::removeTeamMember($owner, $team, $player);
+        Teams::removeTeamMember($team, $player, $owner);
 
         // Team functionality
         $this->assertFalse($team->allMembers()->contains($player));
@@ -67,7 +68,7 @@ class RemoveTeamMemberTest extends TestCase
     }
 
     /** @test */
-    public function it_does_not_allow_non_members_to_leave_a_team()
+    public function it_does_not_allow_a_non_member_to_be_removed_from_a_team()
     {
         Event::fake();
 
@@ -75,13 +76,15 @@ class RemoveTeamMemberTest extends TestCase
         $team = Teams::createTeam($owner, 'Test Team');
         $player = Player::factory()->create();
 
-        $this->expectException(AuthorizationException::class);
+        $this->expectException(ValidationException::class);
 
         try {
-            Teams::leaveTeam($player, $team);
-        } catch (AuthorizationException $e) {
-            Event::assertNotDispatched(MemberLeavingTeam::class);
-            Event::assertNotDispatched(MemberLeftTeam::class);
+            Teams::removeTeamMember($team, $player, $owner);
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('member', $e->errors());
+
+            Event::assertNotDispatched(RemovingTeamMember::class);
+            Event::assertNotDispatched(TeamMemberRemoved::class);
             Event::assertNotDispatched(DeletingMembership::class);
             Event::assertNotDispatched(MembershipDeleted::class);
 
@@ -90,20 +93,23 @@ class RemoveTeamMemberTest extends TestCase
     }
 
     /** @test */
-    public function it_does_not_allow_the_owner_to_leave_a_team_that_has_no_other_members()
+    public function it_does_not_allow_a_non_member_to_remove_a_member_from_the_team()
     {
         Event::fake();
 
         $owner = Player::factory()->create();
         $team = Teams::createTeam($owner, 'Test Team');
+        $player = Player::factory()->create();
+        Teams::addTeamMember($owner, $team, $player);
+        $nonTeamMember = Player::factory()->create();
 
         $this->expectException(AuthorizationException::class);
 
         try {
-            Teams::leaveTeam($owner, $team);
+            Teams::removeTeamMember($team, $player, $nonTeamMember);
         } catch (AuthorizationException $e) {
-            Event::assertNotDispatched(MemberLeavingTeam::class);
-            Event::assertNotDispatched(MemberLeftTeam::class);
+            Event::assertNotDispatched(RemovingTeamMember::class);
+            Event::assertNotDispatched(TeamMemberRemoved::class);
             Event::assertNotDispatched(DeletingMembership::class);
             Event::assertNotDispatched(MembershipDeleted::class);
 
@@ -112,7 +118,33 @@ class RemoveTeamMemberTest extends TestCase
     }
 
     /** @test */
-    public function it_does_not_allow_the_owner_to_leave_a_team_that_has_other_members()
+    public function it_does_not_allow_an_unauthorized_member_to_remove_another_member_from_the_team()
+    {
+        Event::fake();
+
+        $owner = Player::factory()->create();
+        $team = Teams::createTeam($owner, 'Test Team');
+        $player = Player::factory()->create();
+        Teams::addTeamMember($owner, $team, $player);
+        $unauthorizedTeamMember = Player::factory()->create();
+        Teams::addTeamMember($owner, $team, $unauthorizedTeamMember);
+
+        $this->expectException(AuthorizationException::class);
+
+        try {
+            Teams::removeTeamMember($team, $player, $unauthorizedTeamMember);
+        } catch (AuthorizationException $e) {
+            Event::assertNotDispatched(RemovingTeamMember::class);
+            Event::assertNotDispatched(TeamMemberRemoved::class);
+            Event::assertNotDispatched(DeletingMembership::class);
+            Event::assertNotDispatched(MembershipDeleted::class);
+
+            throw $e;
+        }
+    }
+
+    /** @test */
+    public function it_does_not_allow_an_authorized_member_to_remove_himself_from_a_team_that_has_other_members()
     {
         Event::fake();
 
@@ -121,13 +153,39 @@ class RemoveTeamMemberTest extends TestCase
         $player = Player::factory()->create();
         Teams::addTeamMember($owner, $team, $player);
 
-        $this->expectException(AuthorizationException::class);
+        $this->expectException(ValidationException::class);
 
         try {
-            Teams::leaveTeam($owner, $team);
-        } catch (AuthorizationException $e) {
-            Event::assertNotDispatched(MemberLeavingTeam::class);
-            Event::assertNotDispatched(MemberLeftTeam::class);
+            Teams::removeTeamMember($team, $owner, $owner);
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('member', $e->errors());
+
+            Event::assertNotDispatched(RemovingTeamMember::class);
+            Event::assertNotDispatched(TeamMemberRemoved::class);
+            Event::assertNotDispatched(DeletingMembership::class);
+            Event::assertNotDispatched(MembershipDeleted::class);
+
+            throw $e;
+        }
+    }
+
+    /** @test */
+    public function it_does_not_allow_an_authorized_member_to_remove_himself_from_a_team_that_has_no_other_members()
+    {
+        Event::fake();
+
+        $owner = Player::factory()->create();
+        $team = Teams::createTeam($owner, 'Test Team');
+
+        $this->expectException(ValidationException::class);
+
+        try {
+            Teams::removeTeamMember($team, $owner, $owner);
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('member', $e->errors());
+
+            Event::assertNotDispatched(RemovingTeamMember::class);
+            Event::assertNotDispatched(TeamMemberRemoved::class);
             Event::assertNotDispatched(DeletingMembership::class);
             Event::assertNotDispatched(MembershipDeleted::class);
 

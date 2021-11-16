@@ -8,8 +8,11 @@ use R4nkt\Teams\Events\InvitingTeamMember;
 use R4nkt\Teams\Events\TeamMemberInvited;
 use R4nkt\Teams\Teams;
 
-class TeamInvitation extends Model
+class Invitation extends Model
 {
+    /** @var string */
+    protected $table = 'team_invitations';
+
     /** @var array */
     protected $fillable = [
         'inviter_id',

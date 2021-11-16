@@ -2,19 +2,19 @@
 
 namespace R4nkt\Teams;
 
-use R4nkt\Teams\Contracts\AcceptsTeamInvitations;
+use R4nkt\Teams\Contracts\AcceptsInvitations;
 use R4nkt\Teams\Contracts\AddsTeamMembers;
 use R4nkt\Teams\Contracts\BelongsToTeam;
 use R4nkt\Teams\Contracts\CreatesTeams;
 use R4nkt\Teams\Contracts\DeletesTeams;
 use R4nkt\Teams\Contracts\InvitesTeamMembers;
 use R4nkt\Teams\Contracts\LeavesTeams;
-use R4nkt\Teams\Contracts\RejectsTeamInvitations;
+use R4nkt\Teams\Contracts\RejectsInvitations;
 use R4nkt\Teams\Contracts\RemovesTeamMembers;
-use R4nkt\Teams\Contracts\RevokesTeamInvitations;
+use R4nkt\Teams\Contracts\RevokesInvitations;
 use R4nkt\Teams\Models\Membership;
 use R4nkt\Teams\Models\Team;
-use R4nkt\Teams\Models\TeamInvitation;
+use R4nkt\Teams\Models\Invitation;
 
 class Teams
 {
@@ -36,7 +36,7 @@ class Teams
     /**
      * The team invitation model that should be used by Teams.
      */
-    public static string $teamInvitationModel = TeamInvitation::class;
+    public static string $teamInvitationModel = Invitation::class;
 
     /**
      * Get the name of the member model used by the application.
@@ -123,7 +123,7 @@ class Teams
     /**
      * Specify the team invitation model that should be used by Teams.
      */
-    public static function useTeamInvitationModel(string $model): self
+    public static function useInvitationModel(string $model): self
     {
         static::$teamInvitationModel = $model;
 
@@ -133,14 +133,14 @@ class Teams
     /**
      * Register a class / callback that should be used to accept team invitations.
      */
-    public static function acceptTeamInvitationsUsing(string $class): void
+    public static function acceptInvitationsUsing(string $class): void
     {
-        app()->singleton(AcceptsTeamInvitations::class, $class);
+        app()->singleton(AcceptsInvitations::class, $class);
     }
 
-    public static function acceptTeamInvitation(BelongsToTeam $accepter, TeamInvitation $invitation): void
+    public static function acceptInvitation(BelongsToTeam $accepter, Invitation $invitation): void
     {
-        app(AcceptsTeamInvitations::class)->accept($accepter, $invitation);
+        app(AcceptsInvitations::class)->accept($accepter, $invitation);
     }
 
     /**
@@ -190,7 +190,7 @@ class Teams
         app()->singleton(InvitesTeamMembers::class, $class);
     }
 
-    public static function inviteTeamMember(BelongsToTeam $inviter, Team $team, BelongsToTeam $invitee, ?array $attributes = null): TeamInvitation
+    public static function inviteTeamMember(BelongsToTeam $inviter, Team $team, BelongsToTeam $invitee, ?array $attributes = null): Invitation
     {
         return app(InvitesTeamMembers::class)->invite($inviter, $team, $invitee, $attributes);
     }
@@ -211,27 +211,27 @@ class Teams
     /**
      * Register a class / callback that should be used to reject team invitations.
      */
-    public static function rejectTeamInvitationsUsing(string $class): void
+    public static function rejectInvitationsUsing(string $class): void
     {
-        app()->singleton(RejectsTeamInvitations::class, $class);
+        app()->singleton(RejectsInvitations::class, $class);
     }
 
-    public static function rejectTeamInvitation(BelongsToTeam $rejecter, TeamInvitation $invitation): void
+    public static function rejectInvitation(BelongsToTeam $rejecter, Invitation $invitation): void
     {
-        app(RejectsTeamInvitations::class)->reject($rejecter, $invitation);
+        app(RejectsInvitations::class)->reject($rejecter, $invitation);
     }
 
     /**
      * Register a class / callback that should be used to revoke team invitations.
      */
-    public static function revokeTeamInvitationsUsing(string $class): void
+    public static function revokeInvitationsUsing(string $class): void
     {
-        app()->singleton(RevokesTeamInvitations::class, $class);
+        app()->singleton(RevokesInvitations::class, $class);
     }
 
-    public static function revokeTeamInvitation(BelongsToTeam $revoker, TeamInvitation $invitation): void
+    public static function revokeInvitation(Invitation $invitation, BelongsToTeam $invokedBy): void
     {
-        app(RevokesTeamInvitations::class)->revoke($revoker, $invitation);
+        app(RevokesInvitations::class)->revoke($invitation, $invokedBy);
     }
 
     /**
@@ -242,9 +242,9 @@ class Teams
         app()->singleton(RemovesTeamMembers::class, $class);
     }
 
-    public static function removeTeamMember(BelongsToTeam $remover, Team $team, BelongsToTeam $member): void
+    public static function removeTeamMember(Team $team, BelongsToTeam $member, BelongsToTeam $invokedBy): void
     {
-        app(RemovesTeamMembers::class)->remove($remover, $team, $member);
+        app(RemovesTeamMembers::class)->remove($team, $member, $invokedBy);
     }
 
     /**

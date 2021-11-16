@@ -10,5 +10,5 @@ interface RemovesTeamMembers
     /**
      * Remove a member from a team.
      */
-    public function remove(BelongsToTeam $owner, Team $team, BelongsToTeam $member): void;
+    public function remove(Team $team, BelongsToTeam $member, BelongsToTeam $invokedBy): void;
 }

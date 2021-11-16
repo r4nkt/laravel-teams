@@ -5,9 +5,9 @@ namespace R4nkt\Teams\Policies;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use R4nkt\Teams\Contracts\BelongsToTeam;
 use R4nkt\Teams\Models\Team;
-use R4nkt\Teams\Models\TeamInvitation;
+use R4nkt\Teams\Models\Invitation;
 
-class TeamInvitationPolicy
+class InvitationPolicy
 {
     use HandlesAuthorization;
 
@@ -26,7 +26,7 @@ class TeamInvitationPolicy
      *
      * @return mixed
      */
-    public function view(BelongsToTeam $user, TeamInvitation $invitation)
+    public function view(BelongsToTeam $user, Invitation $invitation)
     {
         return $user->isInvitee($invitation)
             || $user->ownsInvitationTeam($invitation);
@@ -47,7 +47,7 @@ class TeamInvitationPolicy
      *
      * @return mixed
      */
-    public function update(BelongsToTeam $user, TeamInvitation $invitation)
+    public function update(BelongsToTeam $user, Invitation $invitation)
     {
         return $user->isInviter($invitation)
             || $user->ownsInvitationTeam($invitation);
@@ -58,7 +58,7 @@ class TeamInvitationPolicy
      *
      * @return mixed
      */
-    public function acceptTeamInvitation(BelongsToTeam $user, TeamInvitation $invitation)
+    public function acceptInvitation(BelongsToTeam $user, Invitation $invitation)
     {
         return $user->isInvitee($invitation);
     }
@@ -68,7 +68,7 @@ class TeamInvitationPolicy
      *
      * @return mixed
      */
-    public function rejectTeamInvitation(BelongsToTeam $user, TeamInvitation $invitation)
+    public function rejectInvitation(BelongsToTeam $user, Invitation $invitation)
     {
         return $user->isInvitee($invitation);
     }
@@ -78,7 +78,7 @@ class TeamInvitationPolicy
      *
      * @return mixed
      */
-    public function revokeTeamInvitation(BelongsToTeam $user, TeamInvitation $invitation)
+    public function revokeInvitation(BelongsToTeam $user, Invitation $invitation)
     {
         return $user->isInvitee($invitation)
             || $user->ownsInvitationTeam($invitation);
