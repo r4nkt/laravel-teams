@@ -3,10 +3,12 @@
 namespace R4nkt\Teams\Models;
 
 use Illuminate\Database\Eloquent\Relations\Pivot;
-use R4nkt\Teams\Events\AddingTeamMember;
-use R4nkt\Teams\Events\TeamMemberAdded;
-use R4nkt\Teams\Events\TeamMembershipDeleted;
-use R4nkt\Teams\Events\TeamMembershipUpdated;
+use R4nkt\Teams\Events\CreatingMembership;
+use R4nkt\Teams\Events\DeletingMembership;
+use R4nkt\Teams\Events\MembershipCreated;
+use R4nkt\Teams\Events\MembershipDeleted;
+use R4nkt\Teams\Events\MembershipUpdated;
+use R4nkt\Teams\Events\UpdatingMembership;
 
 class Membership extends Pivot
 {
@@ -23,9 +25,11 @@ class Membership extends Pivot
 
     /** @var array */
     protected $dispatchesEvents = [
-        'creating' => AddingTeamMember::class,
-        'created' => TeamMemberAdded::class,
-        'updated' => TeamMembershipUpdated::class,
-        'deleted' => TeamMembershipDeleted::class,
+        'created' => MembershipCreated::class,
+        'creating' => CreatingMembership::class,
+        'deleted' => MembershipDeleted::class,
+        'deleting' => DeletingMembership::class,
+        'updated' => MembershipUpdated::class,
+        'updating' => UpdatingMembership::class,
     ];
 }

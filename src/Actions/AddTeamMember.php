@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use R4nkt\Teams\Contracts\AddsTeamMembers;
 use R4nkt\Teams\Contracts\BelongsToTeam;
+use R4nkt\Teams\Events\AddingTeamMember;
+use R4nkt\Teams\Events\TeamMemberAdded;
 use R4nkt\Teams\Models\Team;
 
 class AddTeamMember implements AddsTeamMembers
@@ -21,11 +23,11 @@ class AddTeamMember implements AddsTeamMembers
 
         $this->validate($team, $member, $attributes);
 
-        // AddingTeamMember dispatched automatically via model...
+        AddingTeamMember::dispatch($team, $member, $owner, $attributes);
 
         $team->members()->attach($member, ['attributes' => $attributes]);
 
-        // TeamMemberAdded dispatched automatically via model...
+        TeamMemberAdded::dispatch($team, $member, $owner, $attributes);
 
         $team->refresh('members');
     }

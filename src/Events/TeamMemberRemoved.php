@@ -8,7 +8,7 @@ use Illuminate\Queue\SerializesModels;
 use R4nkt\Teams\Contracts\BelongsToTeam;
 use R4nkt\Teams\Models\Team;
 
-class TeamMemberAdded
+class TeamMemberRemoved
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -16,6 +16,5 @@ class TeamMemberAdded
         public Team $team,
         public BelongsToTeam $member,
         public BelongsToTeam $invokedBy,
-        public array $attributes,
     ) {}
 }

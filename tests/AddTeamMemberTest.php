@@ -5,6 +5,8 @@ namespace R4nkt\Teams\Tests;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\ValidationException;
 use R4nkt\Teams\Events\AddingTeamMember;
+use R4nkt\Teams\Events\CreatingMembership;
+use R4nkt\Teams\Events\MembershipCreated;
 use R4nkt\Teams\Events\TeamMemberAdded;
 use R4nkt\Teams\Models\Team;
 use R4nkt\Teams\Teams;
@@ -46,12 +48,24 @@ class AddTeamMemberTest extends TestCase
         $this->assertTrue($player->belongsToTeam($team));
 
         // Events
-        Event::assertDispatched(function (AddingTeamMember $event) use ($team, $player, $role) {
+        Event::assertDispatched(function (AddingTeamMember $event) use ($team, $player, $owner, $role) {
+            return $event->team->id === $team->id
+                && $event->member->getKey() === $player->getKey()
+                && $event->invokedBy->getKey() === $owner->getKey()
+                && $event->attributes['role'] === $role;
+        });
+        Event::assertDispatched(function (TeamMemberAdded $event) use ($team, $player, $owner, $role) {
+            return $event->team->id === $team->id
+                && $event->member->getKey() === $player->getKey()
+                && $event->invokedBy->getKey() === $owner->getKey()
+                && $event->attributes['role'] === $role;
+        });
+        Event::assertDispatched(function (CreatingMembership $event) use ($team, $player, $role) {
             return $event->membership->team_id === $team->id
                 && $event->membership->member_id === $player->id
                 && $event->membership->attributes['role'] === $role;
         });
-        Event::assertDispatched(function (TeamMemberAdded $event) use ($team, $player, $role) {
+        Event::assertDispatched(function (MembershipCreated $event) use ($team, $player, $role) {
             return $event->membership->team_id === $team->id
                 && $event->membership->member_id === $player->id
                 && $event->membership->attributes['role'] === $role;
@@ -90,6 +104,8 @@ class AddTeamMemberTest extends TestCase
             // Events
             Event::assertNotDispatched(AddingTeamMember::class);
             Event::assertNotDispatched(TeamMemberAdded::class);
+            Event::assertNotDispatched(CreatingMembership::class);
+            Event::assertNotDispatched(MembershipCreated::class);
 
             throw $e;
         }
@@ -128,6 +144,8 @@ class AddTeamMemberTest extends TestCase
             // Events
             Event::assertNotDispatched(AddingTeamMember::class);
             Event::assertNotDispatched(TeamMemberAdded::class);
+            Event::assertNotDispatched(CreatingMembership::class);
+            Event::assertNotDispatched(MembershipCreated::class);
 
             throw $e;
         }

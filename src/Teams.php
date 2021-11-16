@@ -10,6 +10,7 @@ use R4nkt\Teams\Contracts\DeletesTeams;
 use R4nkt\Teams\Contracts\InvitesTeamMembers;
 use R4nkt\Teams\Contracts\LeavesTeams;
 use R4nkt\Teams\Contracts\RejectsTeamInvitations;
+use R4nkt\Teams\Contracts\RemovesTeamMembers;
 use R4nkt\Teams\Contracts\RevokesTeamInvitations;
 use R4nkt\Teams\Models\Membership;
 use R4nkt\Teams\Models\Team;
@@ -131,13 +132,10 @@ class Teams
 
     /**
      * Register a class / callback that should be used to accept team invitations.
-     *
-     * @param  string  $class
-     * @return void
      */
-    public static function acceptTeamInvitationsUsing(string $class)
+    public static function acceptTeamInvitationsUsing(string $class): void
     {
-        return app()->singleton(AcceptsTeamInvitations::class, $class);
+        app()->singleton(AcceptsTeamInvitations::class, $class);
     }
 
     public static function acceptTeamInvitation(BelongsToTeam $accepter, TeamInvitation $invitation): void
@@ -147,13 +145,10 @@ class Teams
 
     /**
      * Register a class / callback that should be used to add team members.
-     *
-     * @param  string  $class
-     * @return void
      */
-    public static function addTeamMembersUsing(string $class)
+    public static function addTeamMembersUsing(string $class): void
     {
-        return app()->singleton(AddsTeamMembers::class, $class);
+        app()->singleton(AddsTeamMembers::class, $class);
     }
 
     public static function addTeamMember(BelongsToTeam $owner, Team $team, BelongsToTeam $member, array $attributes = []): void
@@ -189,13 +184,10 @@ class Teams
 
     /**
      * Register a class / callback that should be used to invite team members.
-     *
-     * @param  string  $class
-     * @return void
      */
-    public static function inviteTeamMembersUsing(string $class)
+    public static function inviteTeamMembersUsing(string $class): void
     {
-        return app()->singleton(InvitesTeamMembers::class, $class);
+        app()->singleton(InvitesTeamMembers::class, $class);
     }
 
     public static function inviteTeamMember(BelongsToTeam $inviter, Team $team, BelongsToTeam $invitee, ?array $attributes = null): TeamInvitation
@@ -205,13 +197,10 @@ class Teams
 
     /**
      * Register a class / callback that should be used when team members leave teams.
-     *
-     * @param  string  $class
-     * @return void
      */
-    public static function leaveTeamsUsing(string $class)
+    public static function leaveTeamsUsing(string $class): void
     {
-        return app()->singleton(LeavesTeams::class, $class);
+        app()->singleton(LeavesTeams::class, $class);
     }
 
     public static function leaveTeam(BelongsToTeam $member, Team $team): void
@@ -221,13 +210,10 @@ class Teams
 
     /**
      * Register a class / callback that should be used to reject team invitations.
-     *
-     * @param  string  $class
-     * @return void
      */
-    public static function rejectTeamInvitationsUsing(string $class)
+    public static function rejectTeamInvitationsUsing(string $class): void
     {
-        return app()->singleton(RejectsTeamInvitations::class, $class);
+        app()->singleton(RejectsTeamInvitations::class, $class);
     }
 
     public static function rejectTeamInvitation(BelongsToTeam $rejecter, TeamInvitation $invitation): void
@@ -237,13 +223,10 @@ class Teams
 
     /**
      * Register a class / callback that should be used to revoke team invitations.
-     *
-     * @param  string  $class
-     * @return void
      */
-    public static function revokeTeamInvitationsUsing(string $class)
+    public static function revokeTeamInvitationsUsing(string $class): void
     {
-        return app()->singleton(RevokesTeamInvitations::class, $class);
+        app()->singleton(RevokesTeamInvitations::class, $class);
     }
 
     public static function revokeTeamInvitation(BelongsToTeam $revoker, TeamInvitation $invitation): void
@@ -253,23 +236,22 @@ class Teams
 
     /**
      * Register a class / callback that should be used to remove team members.
-     *
-     * @param  string  $class
-     * @return void
      */
-    // public static function removeTeamMembersUsing(string $class)
-    // {
-    //     return app()->singleton(RemovesTeamMembers::class, $class);
-    // }
+    public static function removeTeamMembersUsing(string $class): void
+    {
+        app()->singleton(RemovesTeamMembers::class, $class);
+    }
+
+    public static function removeTeamMember(BelongsToTeam $remover, Team $team, BelongsToTeam $member): void
+    {
+        app(RemovesTeamMembers::class)->remove($remover, $team, $member);
+    }
 
     /**
      * Register a class / callback that should be used to update teams.
-     *
-     * @param  string  $class
-     * @return void
      */
-    // public static function updateTeamsUsing(string $class)
+    // public static function updateTeamsUsing(string $class): void
     // {
-    //     return app()->singleton(UpdatesTeamNames::class, $class);
+    //     app()->singleton(UpdatesTeamNames::class, $class);
     // }
 }

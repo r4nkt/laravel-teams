@@ -3,13 +3,14 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use R4nkt\Teams\Actions\AddTeamMember;
 use R4nkt\Teams\Actions\AcceptTeamInvitation;
+use R4nkt\Teams\Actions\AddTeamMember;
 use R4nkt\Teams\Actions\CreateTeam;
 use R4nkt\Teams\Actions\DeleteTeam;
 use R4nkt\Teams\Actions\InviteTeamMember;
 use R4nkt\Teams\Actions\LeaveTeam;
 use R4nkt\Teams\Actions\RejectTeamInvitation;
+use R4nkt\Teams\Actions\RemoveTeamMember;
 use R4nkt\Teams\Actions\RevokeTeamInvitation;
 use R4nkt\Teams\Teams;
 
@@ -39,6 +40,7 @@ class TeamsServiceProvider extends ServiceProvider
         Teams::inviteTeamMembersUsing(InviteTeamMember::class);
         Teams::leaveTeamsUsing(LeaveTeam::class);
         Teams::rejectTeamInvitationsUsing(RejectTeamInvitation::class);
+        Teams::removeTeamMembersUsing(RemoveTeamMember::class);
         Teams::revokeTeamInvitationsUsing(RevokeTeamInvitation::class);
 
         Teams::useMemberModel(config('teams.member_model'));
