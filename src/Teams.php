@@ -268,9 +268,9 @@ class Teams
         app()->singleton(RevokesInvitations::class, $class);
     }
 
-    public static function revokeInvitation(Invitation $invitation, BelongsToTeam $invokedBy): void
+    public static function revokeInvitation(BelongsToTeam $invokedBy, Invitation $invitation): void
     {
-        app(RevokesInvitations::class)->revoke($invitation, $invokedBy);
+        app(RevokesInvitations::class)->revoke($invokedBy, $invitation);
     }
 
     /**

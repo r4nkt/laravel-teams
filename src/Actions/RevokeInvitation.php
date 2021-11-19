@@ -14,7 +14,7 @@ class RevokeInvitation implements RevokesInvitations
     /**
      * Revoke a pending team invitation.
      */
-    public function revoke(Invitation $invitation, BelongsToTeam $invokedBy): void
+    public function revoke(BelongsToTeam $invokedBy, Invitation $invitation): void
     {
         Gate::forUser($invokedBy)->authorize('revokeInvitation', $invitation);
 

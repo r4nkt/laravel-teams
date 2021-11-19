@@ -22,7 +22,7 @@ class RevokeInvitationTest extends TestCase
 
         $invitation = Teams::inviteTeamMember($owner, $team, $prospect);
 
-        Teams::revokeInvitation($invitation, $owner);
+        Teams::revokeInvitation($owner, $invitation);
 
         $this->assertSame(0, $team->invitations()->count());
         $this->assertSame(0, $prospect->receivedInvitations()->count());
@@ -55,7 +55,7 @@ class RevokeInvitationTest extends TestCase
         $this->expectException(AuthorizationException::class);
 
         try {
-            Teams::revokeInvitation($invitation, $notInviter);
+            Teams::revokeInvitation($notInviter, $invitation);
         } catch (AuthorizationException $e) {
             $this->assertSame(1, $team->invitations()->count());
             $this->assertSame(1, $prospect->receivedInvitations()->count());
@@ -78,7 +78,7 @@ class RevokeInvitationTest extends TestCase
         $this->expectException(AuthorizationException::class);
 
         try {
-            Teams::revokeInvitation($invitation, $nonTeamMember);
+            Teams::revokeInvitation($nonTeamMember, $invitation);
         } catch (AuthorizationException $e) {
             $this->assertSame(1, $team->invitations()->count());
             $this->assertSame(1, $prospect->receivedInvitations()->count());
