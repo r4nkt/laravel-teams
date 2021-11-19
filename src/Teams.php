@@ -229,9 +229,9 @@ class Teams
         app()->singleton(InvitesTeamMembers::class, $class);
     }
 
-    public static function inviteTeamMember(Team $team, BelongsToTeam $member, BelongsToTeam $invokedBy, ?array $attributes = null): Invitation
+    public static function inviteTeamMember(BelongsToTeam $invokedBy, Team $team, BelongsToTeam $member, ?array $attributes = null): Invitation
     {
-        return app(InvitesTeamMembers::class)->invite($team, $member, $invokedBy, $attributes);
+        return app(InvitesTeamMembers::class)->invite($invokedBy, $team, $member, $attributes);
     }
 
     /**

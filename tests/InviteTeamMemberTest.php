@@ -30,7 +30,7 @@ class InviteTeamMemberTest extends TestCase
         $prospect = Player::factory()->create();
         $role = 'some.role';
 
-        $invitation = Teams::inviteTeamMember($team, $prospect, $owner, ['role' => $role]);
+        $invitation = Teams::inviteTeamMember($owner, $team, $prospect, ['role' => $role]);
 
         // Inviter, invitee, and team
         $this->assertSame(1, $owner->sentInvitations()->count());
@@ -65,7 +65,7 @@ class InviteTeamMemberTest extends TestCase
         Event::fake();
 
         try {
-            Teams::inviteTeamMember($team, $prospect, $teamMember);
+            Teams::inviteTeamMember($teamMember, $team, $prospect);
         } catch (AuthorizationException $e) {
             // Inviter, invitee, and team
             $this->assertSame(0, $owner->sentInvitations()->count());
@@ -88,14 +88,14 @@ class InviteTeamMemberTest extends TestCase
         $team = Teams::createTeam($owner, 'Test Team');
         $prospect = Player::factory()->create();
 
-        $invitation = Teams::inviteTeamMember($team, $prospect, $owner);
+        $invitation = Teams::inviteTeamMember($owner, $team, $prospect);
 
         $this->expectException(ValidationException::class);
 
         Event::fake();
 
         try {
-            Teams::inviteTeamMember($team, $prospect, $owner);
+            Teams::inviteTeamMember($owner, $team, $prospect);
         } catch (ValidationException $e) {
             $this->assertArrayHasKey('member', $e->errors());
 
@@ -125,7 +125,7 @@ class InviteTeamMemberTest extends TestCase
         Event::fake();
 
         try {
-            Teams::inviteTeamMember($team, $teamMember, $owner);
+            Teams::inviteTeamMember($owner, $team, $teamMember);
         } catch (ValidationException $e) {
             $this->assertArrayHasKey('member', $e->errors());
 
@@ -152,8 +152,8 @@ class InviteTeamMemberTest extends TestCase
         $teamB = Teams::createTeam($owner, 'Team B');
         $prospect = Player::factory()->create();
 
-        $invitationA = Teams::inviteTeamMember($teamA, $prospect, $owner);
-        $invitationB = Teams::inviteTeamMember($teamB, $prospect, $owner);
+        $invitationA = Teams::inviteTeamMember($owner, $teamA, $prospect);
+        $invitationB = Teams::inviteTeamMember($owner, $teamB, $prospect);
 
         // Inviter, invitee, and teams
         $this->assertSame(2, $owner->sentInvitations()->count());
@@ -179,7 +179,7 @@ class InviteTeamMemberTest extends TestCase
         $this->expectException(AuthorizationException::class);
 
         try {
-            Teams::inviteTeamMember($team, $prospect, $nonTeamMember);
+            Teams::inviteTeamMember($nonTeamMember, $team, $prospect);
         } catch (AuthorizationException $e) {
             // Inviter, invitee, and team
             $this->assertSame(0, $nonTeamMember->sentInvitations()->count());

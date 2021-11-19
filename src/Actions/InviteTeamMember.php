@@ -16,7 +16,7 @@ class InviteTeamMember implements InvitesTeamMembers
     /**
      * Invite a new team member to the given team.
      */
-    public function invite(Team $team, BelongsToTeam $member, BelongsToTeam $invokedBy, ?array $attributes = null): Invitation
+    public function invite(BelongsToTeam $invokedBy, Team $team, BelongsToTeam $member, ?array $attributes = null): Invitation
     {
         Gate::forUser($invokedBy)->authorize('create', [Invitation::class, $team, $member, $attributes]);
 

@@ -20,7 +20,7 @@ class RevokeInvitationTest extends TestCase
         $team = Teams::createTeam($owner, 'Test Team');
         $prospect = Player::factory()->create();
 
-        $invitation = Teams::inviteTeamMember($team, $prospect, $owner);
+        $invitation = Teams::inviteTeamMember($owner, $team, $prospect);
 
         Teams::revokeInvitation($invitation, $owner);
 
@@ -50,7 +50,7 @@ class RevokeInvitationTest extends TestCase
         Teams::addTeamMember($owner, $team, $notInviter);
         $prospect = Player::factory()->create();
 
-        $invitation = Teams::inviteTeamMember($team, $prospect, $owner);
+        $invitation = Teams::inviteTeamMember($owner, $team, $prospect);
 
         $this->expectException(AuthorizationException::class);
 
@@ -73,7 +73,7 @@ class RevokeInvitationTest extends TestCase
         $nonTeamMember = Player::factory()->create();
         $prospect = Player::factory()->create();
 
-        $invitation = Teams::inviteTeamMember($team, $prospect, $owner);
+        $invitation = Teams::inviteTeamMember($owner, $team, $prospect);
 
         $this->expectException(AuthorizationException::class);
 
