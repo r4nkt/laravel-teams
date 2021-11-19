@@ -30,7 +30,7 @@ class RemoveTeamMemberTest extends TestCase
         $owner = Player::factory()->create();
         $team = Teams::createTeam($owner, 'Test Team');
         $player = Player::factory()->create();
-        Teams::addTeamMember($team, $player, $owner);
+        Teams::addTeamMember($owner, $team, $player);
 
         Teams::removeTeamMember($team, $player, $owner);
 
@@ -100,7 +100,7 @@ class RemoveTeamMemberTest extends TestCase
         $owner = Player::factory()->create();
         $team = Teams::createTeam($owner, 'Test Team');
         $player = Player::factory()->create();
-        Teams::addTeamMember($team, $player, $owner);
+        Teams::addTeamMember($owner, $team, $player);
         $nonTeamMember = Player::factory()->create();
 
         $this->expectException(AuthorizationException::class);
@@ -125,9 +125,9 @@ class RemoveTeamMemberTest extends TestCase
         $owner = Player::factory()->create();
         $team = Teams::createTeam($owner, 'Test Team');
         $player = Player::factory()->create();
-        Teams::addTeamMember($team, $player, $owner);
+        Teams::addTeamMember($owner, $team, $player);
         $unauthorizedTeamMember = Player::factory()->create();
-        Teams::addTeamMember($team, $unauthorizedTeamMember, $owner);
+        Teams::addTeamMember($owner, $team, $unauthorizedTeamMember);
 
         $this->expectException(AuthorizationException::class);
 
@@ -151,7 +151,7 @@ class RemoveTeamMemberTest extends TestCase
         $owner = Player::factory()->create();
         $team = Teams::createTeam($owner, 'Test Team');
         $player = Player::factory()->create();
-        Teams::addTeamMember($team, $player, $owner);
+        Teams::addTeamMember($owner, $team, $player);
 
         $this->expectException(ValidationException::class);
 

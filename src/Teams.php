@@ -190,9 +190,9 @@ class Teams
         app()->singleton(AddsTeamMembers::class, $class);
     }
 
-    public static function addTeamMember(Team $team, BelongsToTeam $member, BelongsToTeam $invokedBy, array $attributes = []): void
+    public static function addTeamMember(BelongsToTeam $invokedBy, Team $team, BelongsToTeam $member, array $attributes = []): void
     {
-        app(AddsTeamMembers::class)->add($team, $member, $invokedBy, $attributes);
+        app(AddsTeamMembers::class)->add($invokedBy, $team, $member, $attributes);
     }
 
     // /**

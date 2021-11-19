@@ -21,7 +21,12 @@ class AcceptInvitation implements AcceptsInvitations
 
         AcceptingInvitation::dispatch($invitation, $invokedBy);
 
-        Teams::addTeamMember($invitation->team, $invitation->invitee, $invitation->inviter, $invitation->attributes);
+        Teams::addTeamMember(
+            $invitation->inviter,
+            $invitation->team,
+            $invitation->invitee,
+            $invitation->attributes,
+        );
 
         $invitation->delete();
 

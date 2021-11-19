@@ -45,9 +45,9 @@ class RevokeInvitationTest extends TestCase
         $owner = Player::factory()->create();
         $team = Teams::createTeam($owner, 'Test Team');
         $inviter = Player::factory()->create();
-        Teams::addTeamMember($team, $inviter, $owner);
+        Teams::addTeamMember($owner, $team, $inviter);
         $notInviter = Player::factory()->create();
-        Teams::addTeamMember($team, $notInviter, $owner);
+        Teams::addTeamMember($owner, $team, $notInviter);
         $prospect = Player::factory()->create();
 
         $invitation = Teams::inviteTeamMember($team, $prospect, $owner);

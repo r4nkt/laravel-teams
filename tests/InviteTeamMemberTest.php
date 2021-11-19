@@ -57,7 +57,7 @@ class InviteTeamMemberTest extends TestCase
         $owner = Player::factory()->create();
         $team = Teams::createTeam($owner, 'Test Team');
         $teamMember = Player::factory()->create();
-        Teams::addTeamMember($team, $teamMember, $owner);
+        Teams::addTeamMember($owner, $team, $teamMember);
         $prospect = Player::factory()->create();
 
         $this->expectException(AuthorizationException::class);
@@ -118,7 +118,7 @@ class InviteTeamMemberTest extends TestCase
         $owner = Player::factory()->create();
         $team = Teams::createTeam($owner, 'Test Team');
         $teamMember = Player::factory()->create();
-        Teams::addTeamMember($team, $teamMember, $owner);
+        Teams::addTeamMember($owner, $team, $teamMember);
 
         $this->expectException(ValidationException::class);
 

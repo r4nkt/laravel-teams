@@ -46,7 +46,7 @@ class RejectInvitationTest extends TestCase
         $owner = Player::factory()->create();
         $team = Teams::createTeam($owner, 'Test Team');
         $nonOwner = Player::factory()->create();
-        Teams::addTeamMember($team, $nonOwner, $owner);
+        Teams::addTeamMember($owner, $team, $nonOwner);
         $prospect = Player::factory()->create();
 
         $invitation = Teams::inviteTeamMember($team, $prospect, $owner);
