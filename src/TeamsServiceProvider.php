@@ -77,15 +77,21 @@ class TeamsServiceProvider extends PackageServiceProvider
 
     protected function configureActions()
     {
-        Teams::acceptInvitationsUsing($this->app->config['teams.actions.accept_invitations']);
-        Teams::addTeamMembersUsing($this->app->config['teams.actions.add_team_members']);
         Teams::createTeamsUsing($this->app->config['teams.actions.create_teams']);
+        // Teams::updateTeamsUsing($this->app->config['teams.actions.update_teams']);
+        // Teams::transferTeamsUsing($this->app->config['teams.actions.transfer_teams']);
         Teams::deleteTeamsUsing($this->app->config['teams.actions.delete_teams']);
-        Teams::inviteTeamMembersUsing($this->app->config['teams.actions.invite_team_members']);
-        Teams::leaveTeamsUsing($this->app->config['teams.actions.leave_teams']);
-        Teams::rejectInvitationsUsing($this->app->config['teams.actions.reject_invitations']);
+
+        Teams::addTeamMembersUsing($this->app->config['teams.actions.add_team_members']);
+        // Teams::updateTeamMembersUsing($this->app->config['teams.actions.update_team_members']);
         Teams::removeTeamMembersUsing($this->app->config['teams.actions.remove_team_members']);
+
+        Teams::inviteTeamMembersUsing($this->app->config['teams.actions.invite_team_members']);
+        Teams::acceptInvitationsUsing($this->app->config['teams.actions.accept_invitations']);
+        Teams::rejectInvitationsUsing($this->app->config['teams.actions.reject_invitations']);
         Teams::revokeInvitationsUsing($this->app->config['teams.actions.revoke_invitations']);
+
+        Teams::leaveTeamsUsing($this->app->config['teams.actions.leave_teams']);
     }
 
     protected function configurePolicies()
