@@ -32,7 +32,7 @@ class RemoveTeamMemberTest extends TestCase
         $player = Player::factory()->create();
         Teams::addTeamMember($owner, $team, $player);
 
-        Teams::removeTeamMember($team, $player, $owner);
+        Teams::removeTeamMember($owner, $team, $player);
 
         // Team functionality
         $this->assertFalse($team->allMembers()->contains($player));
@@ -79,7 +79,7 @@ class RemoveTeamMemberTest extends TestCase
         $this->expectException(ValidationException::class);
 
         try {
-            Teams::removeTeamMember($team, $player, $owner);
+            Teams::removeTeamMember($owner, $team, $player);
         } catch (ValidationException $e) {
             $this->assertArrayHasKey('member', $e->errors());
 
@@ -106,7 +106,7 @@ class RemoveTeamMemberTest extends TestCase
         $this->expectException(AuthorizationException::class);
 
         try {
-            Teams::removeTeamMember($team, $player, $nonTeamMember);
+            Teams::removeTeamMember($nonTeamMember, $team, $player);
         } catch (AuthorizationException $e) {
             Event::assertNotDispatched(RemovingTeamMember::class);
             Event::assertNotDispatched(TeamMemberRemoved::class);
@@ -132,7 +132,7 @@ class RemoveTeamMemberTest extends TestCase
         $this->expectException(AuthorizationException::class);
 
         try {
-            Teams::removeTeamMember($team, $player, $unauthorizedTeamMember);
+            Teams::removeTeamMember($unauthorizedTeamMember, $team, $player);
         } catch (AuthorizationException $e) {
             Event::assertNotDispatched(RemovingTeamMember::class);
             Event::assertNotDispatched(TeamMemberRemoved::class);
@@ -156,7 +156,7 @@ class RemoveTeamMemberTest extends TestCase
         $this->expectException(ValidationException::class);
 
         try {
-            Teams::removeTeamMember($team, $owner, $owner);
+            Teams::removeTeamMember($owner, $team, $owner);
         } catch (ValidationException $e) {
             $this->assertArrayHasKey('member', $e->errors());
 
@@ -180,7 +180,7 @@ class RemoveTeamMemberTest extends TestCase
         $this->expectException(ValidationException::class);
 
         try {
-            Teams::removeTeamMember($team, $owner, $owner);
+            Teams::removeTeamMember($owner, $team, $owner);
         } catch (ValidationException $e) {
             $this->assertArrayHasKey('member', $e->errors());
 

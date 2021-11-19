@@ -203,9 +203,9 @@ class Teams
     //     app()->singleton(UpdatesTeamMembers::class, $class);
     // }
 
-    // public static function updateTeamMember(Team $team, BelongsToTeam $member, BelongsToTeam $invokedBy, array $attributes): void
+    // public static function updateTeamMember(BelongsToTeam $invokedBy, Team $team, BelongsToTeam $member, array $attributes): void
     // {
-    //     app(UpdatesTeamMembers::class)->update($team, $member, $invokedBy, $attributes);
+    //     app(UpdatesTeamMembers::class)->update($invokedBy, $team, $member, $attributes);
     // }
 
     /**
@@ -216,9 +216,9 @@ class Teams
         app()->singleton(RemovesTeamMembers::class, $class);
     }
 
-    public static function removeTeamMember(Team $team, BelongsToTeam $member, BelongsToTeam $invokedBy): void
+    public static function removeTeamMember(BelongsToTeam $invokedBy, Team $team, BelongsToTeam $member): void
     {
-        app(RemovesTeamMembers::class)->remove($team, $member, $invokedBy);
+        app(RemovesTeamMembers::class)->remove($invokedBy, $team, $member);
     }
 
     /**

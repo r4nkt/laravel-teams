@@ -15,7 +15,7 @@ class RemoveTeamMember implements RemovesTeamMembers
     /**
      * Remove a member from a team.
      */
-    public function remove(Team $team, BelongsToTeam $member, BelongsToTeam $invokedBy): void
+    public function remove(BelongsToTeam $invokedBy, Team $team, BelongsToTeam $member): void
     {
         Gate::forUser($invokedBy)->authorize('removeTeamMember', $team);
 
