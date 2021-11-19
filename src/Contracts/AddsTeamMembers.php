@@ -10,5 +10,5 @@ interface AddsTeamMembers
     /**
      * Add a member to a team.
      */
-    public function add(BelongsToTeam $owner, Team $team, BelongsToTeam $member, array $attributes = []): void;
+    public function add(Team $team, BelongsToTeam $member, BelongsToTeam $invokedBy, array $attributes = []): void;
 }

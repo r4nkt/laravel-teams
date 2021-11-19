@@ -10,5 +10,5 @@ interface RejectsInvitations
     /**
      * Reject a pending team invitation.
      */
-    public function reject(BelongsToTeam $rejecter, Invitation $invitation): void;
+    public function reject(BelongsToTeam $invokedBy, Invitation $invitation): void;
 }

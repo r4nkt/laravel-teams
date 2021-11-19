@@ -10,5 +10,5 @@ interface DeletesTeams
     /**
      * Delete the given team.
      */
-    public function delete(BelongsToTeam $owner, Team $team): void;
+    public function delete(Team $team, BelongsToTeam $invokedBy): void;
 }

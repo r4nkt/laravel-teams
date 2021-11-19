@@ -27,7 +27,7 @@ class LeaveTeamTest extends TestCase
         $owner = Player::factory()->create();
         $team = Teams::createTeam($owner, 'Test Team');
         $player = Player::factory()->create();
-        Teams::addTeamMember($owner, $team, $player);
+        Teams::addTeamMember($team, $player, $owner);
 
         Teams::leaveTeam($player, $team);
 
@@ -103,7 +103,7 @@ class LeaveTeamTest extends TestCase
         $owner = Player::factory()->create();
         $team = Teams::createTeam($owner, 'Test Team');
         $player = Player::factory()->create();
-        Teams::addTeamMember($owner, $team, $player);
+        Teams::addTeamMember($team, $player, $owner);
 
         $this->expectException(AuthorizationException::class);
 

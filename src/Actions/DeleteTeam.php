@@ -12,9 +12,9 @@ class DeleteTeam implements DeletesTeams
     /**
      * Delete the given team.
      */
-    public function delete(BelongsToTeam $owner, Team $team): void
+    public function delete(Team $team, BelongsToTeam $invokedBy): void
     {
-        Gate::forUser($owner)->authorize('delete', $team);
+        Gate::forUser($invokedBy)->authorize('delete', $team);
 
         // DeletingTeam dispatched automatically via model...
 

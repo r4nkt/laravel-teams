@@ -16,18 +16,17 @@ class InviteTeamMember implements InvitesTeamMembers
     /**
      * Invite a new team member to the given team.
      */
-    public function invite(BelongsToTeam $inviter, Team $team, BelongsToTeam $invitee, ?array $attributes = null): Invitation
+    public function invite(Team $team, BelongsToTeam $member, BelongsToTeam $invokedBy, ?array $attributes = null): Invitation
     {
-        Gate::forUser($inviter)->authorize('create', [Invitation::class, $team, $invitee, $attributes]);
+        Gate::forUser($invokedBy)->authorize('create', [Invitation::class, $team, $member, $attributes]);
 
-        $this->validate($team, $invitee, $attributes);
+        $this->validate($team, $member, $attributes);
 
         // InvitingTeamMember dispatched automatically via model...
 
         $invitation = $team->invitations()->create([
-            'member_id' => $invitee->getKey(),
-            'inviter_id' => $inviter->getKey(),
-            'invitee_id' => $invitee->getKey(),
+            'inviter_id' => $invokedBy->getKey(),
+            'invitee_id' => $member->getKey(),
             'attributes' => $attributes,
         ]);
 
@@ -39,17 +38,17 @@ class InviteTeamMember implements InvitesTeamMembers
     /**
      * Validate the invite member operation.
      */
-    protected function validate(Team $team, BelongsToTeam $invitee, ?array $attributes): void
+    protected function validate(Team $team, BelongsToTeam $member, ?array $attributes): void
     {
         Validator::make([
-            'team_id' => $team->getKey(),
-            'invitee' => $invitee->getKey(),
+            'team' => $team->getKey(),
+            'member' => $member->getKey(),
             'attributes' => $attributes,
             'role' => $attributes['role'] ?? null,
         ], $this->rules($team, $attributes), [
-            'invitee.unique' => __('This member has already been invited to the team.'),
+            'member.unique' => __('This member has already been invited to the team.'),
         ])->after(
-            $this->ensureMemberIsNotAlreadyOnTeam($team, $invitee)
+            $this->ensureMemberIsNotAlreadyOnTeam($team, $member)
         )->validateWithBag('inviteTeamMember');
     }
 
@@ -59,7 +58,8 @@ class InviteTeamMember implements InvitesTeamMembers
     protected function rules(Team $team, ?array $attributes): array
     {
         return array_filter([
-            'invitee' => [
+            'team' => 'required|exists:teams,id',
+            'member' => [
                 'required',
                 'int',
                 Rule::unique('team_invitations', 'invitee_id')
@@ -73,12 +73,12 @@ class InviteTeamMember implements InvitesTeamMembers
     /**
      * Ensure that the member is not already on the team.
      */
-    protected function ensureMemberIsNotAlreadyOnTeam(Team $team, BelongsToTeam $invitee): Closure
+    protected function ensureMemberIsNotAlreadyOnTeam(Team $team, BelongsToTeam $member): Closure
     {
-        return function ($validator) use ($invitee, $team) {
+        return function ($validator) use ($member, $team) {
             $validator->errors()->addIf(
-                $team->hasMember($invitee),
-                'invitee',
+                $team->hasMember($member),
+                'member',
                 __('This member already belongs to the team.')
             );
         };

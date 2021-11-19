@@ -18,17 +18,17 @@ class AddTeamMember implements AddsTeamMembers
     /**
      * Add a member to a team.
      */
-    public function add(BelongsToTeam $owner, Team $team, BelongsToTeam $member, array $attributes = []): void
+    public function add(Team $team, BelongsToTeam $member, BelongsToTeam $invokedBy, array $attributes = []): void
     {
-        Gate::forUser($owner)->authorize('addTeamMember', $team);
+        Gate::forUser($invokedBy)->authorize('addTeamMember', $team);
 
         $this->validate($team, $member, $attributes);
 
-        AddingTeamMember::dispatch($team, $member, $owner, $attributes);
+        AddingTeamMember::dispatch($team, $member, $invokedBy, $attributes);
 
         $team->members()->attach($member, ['attributes' => $attributes]);
 
-        TeamMemberAdded::dispatch($team, $member, $owner, $attributes);
+        TeamMemberAdded::dispatch($team, $member, $invokedBy, $attributes);
 
         $team->refresh('members');
     }

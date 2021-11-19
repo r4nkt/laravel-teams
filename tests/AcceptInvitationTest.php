@@ -31,9 +31,9 @@ class AcceptInvitationTest extends TestCase
         $role = 'some.role';
         $attributes = ['role' => $role];
 
-        $invitation = Teams::inviteTeamMember($owner, $team, $prospect, $attributes);
+        $invitation = Teams::inviteTeamMember($team, $prospect, $owner, $attributes);
 
-        Teams::acceptInvitation($prospect, $invitation);
+        Teams::acceptInvitation($invitation, $prospect);
 
         $team->refresh();
 
@@ -72,15 +72,15 @@ class AcceptInvitationTest extends TestCase
         $owner = Player::factory()->create();
         $team = Teams::createTeam($owner, 'Test Team');
         $nonOwner = Player::factory()->create();
-        Teams::addTeamMember($owner, $team, $nonOwner);
+        Teams::addTeamMember($team, $nonOwner, $owner);
         $prospect = Player::factory()->create();
 
-        $invitation = Teams::inviteTeamMember($owner, $team, $prospect);
+        $invitation = Teams::inviteTeamMember($team, $prospect, $owner);
 
         $this->expectException(AuthorizationException::class);
 
         try {
-            Teams::acceptInvitation($nonOwner, $invitation);
+            Teams::acceptInvitation($invitation, $nonOwner);
         } catch (AuthorizationException $e) {
             $this->assertSame(1, $team->invitations()->count());
             $this->assertSame(1, $prospect->receivedInvitations()->count());
@@ -97,12 +97,12 @@ class AcceptInvitationTest extends TestCase
         $team = Teams::createTeam($owner, 'Test Team');
         $prospect = Player::factory()->create();
 
-        $invitation = Teams::inviteTeamMember($owner, $team, $prospect);
+        $invitation = Teams::inviteTeamMember($team, $prospect, $owner);
 
         $this->expectException(AuthorizationException::class);
 
         try {
-            Teams::acceptInvitation($owner, $invitation);
+            Teams::acceptInvitation($invitation, $owner);
         } catch (AuthorizationException $e) {
             $this->assertSame(1, $team->invitations()->count());
             $this->assertSame(1, $prospect->receivedInvitations()->count());
@@ -120,12 +120,12 @@ class AcceptInvitationTest extends TestCase
         $nonTeamMember = Player::factory()->create();
         $prospect = Player::factory()->create();
 
-        $invitation = Teams::inviteTeamMember($owner, $team, $prospect);
+        $invitation = Teams::inviteTeamMember($team, $prospect, $owner);
 
         $this->expectException(AuthorizationException::class);
 
         try {
-            Teams::acceptInvitation($nonTeamMember, $invitation);
+            Teams::acceptInvitation($invitation, $nonTeamMember);
         } catch (AuthorizationException $e) {
             $this->assertSame(1, $team->invitations()->count());
             $this->assertSame(1, $prospect->receivedInvitations()->count());

@@ -10,5 +10,5 @@ interface AcceptsInvitations
     /**
      * Accept a pending team invitation.
      */
-    public function accept(BelongsToTeam $accepter, Invitation $invitation): void;
+    public function accept(Invitation $invitation, BelongsToTeam $inkokedBy): void;
 }

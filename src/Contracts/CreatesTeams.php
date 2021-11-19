@@ -10,5 +10,5 @@ interface CreatesTeams
     /**
      * Validate and create a new team.
      */
-    public function create(BelongsToTeam $owner, string $name, array $attributes = []): Team;
+    public function create(BelongsToTeam $inkokedBy, string $name, array $attributes = []): Team;
 }

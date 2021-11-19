@@ -14,14 +14,14 @@ class RejectInvitation implements RejectsInvitations
     /**
      * Reject a pending team invitation.
      */
-    public function reject(BelongsToTeam $rejecter, Invitation $invitation): void
+    public function reject(BelongsToTeam $invokedBy, Invitation $invitation): void
     {
-        Gate::forUser($rejecter)->authorize('rejectInvitation', $invitation);
+        Gate::forUser($invokedBy)->authorize('rejectInvitation', $invitation);
 
-        RejectingInvitation::dispatch($invitation, $rejecter);
+        RejectingInvitation::dispatch($invitation, $invokedBy);
 
         $invitation->delete();
 
-        InvitationRejected::dispatch($invitation, $rejecter);
+        InvitationRejected::dispatch($invitation, $invokedBy);
     }
 }

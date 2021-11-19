@@ -15,16 +15,16 @@ class AcceptInvitation implements AcceptsInvitations
     /**
      * Accept a pending team invitation.
      */
-    public function accept(BelongsToTeam $accepter, Invitation $invitation): void
+    public function accept(Invitation $invitation, BelongsToTeam $invokedBy): void
     {
-        Gate::forUser($accepter)->authorize('acceptInvitation', $invitation);
+        Gate::forUser($invokedBy)->authorize('acceptInvitation', $invitation);
 
-        AcceptingInvitation::dispatch($invitation, $accepter);
+        AcceptingInvitation::dispatch($invitation, $invokedBy);
 
-        Teams::addTeamMember($invitation->inviter, $invitation->team, $invitation->invitee, $invitation->attributes);
+        Teams::addTeamMember($invitation->team, $invitation->invitee, $invitation->inviter, $invitation->attributes);
 
         $invitation->delete();
 
-        InvitationAccepted::dispatch($invitation, $accepter);
+        InvitationAccepted::dispatch($invitation, $invokedBy);
     }
 }

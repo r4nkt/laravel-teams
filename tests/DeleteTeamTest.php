@@ -28,9 +28,9 @@ class DeleteTeamTest extends TestCase
         $team = Teams::createTeam($owner, 'Test Team');
 
         $player = Player::factory()->create();
-        Teams::addTeamMember($owner, $team, $player);
+        Teams::addTeamMember($team, $player, $owner);
 
-        Teams::deleteTeam($owner, $team);
+        Teams::deleteTeam($team, $owner);
 
         $this->assertFalse($team->exists());
 

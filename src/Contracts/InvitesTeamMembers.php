@@ -11,5 +11,5 @@ interface InvitesTeamMembers
     /**
      * Invite a new team member to the given team.
      */
-    public function invite(BelongsToTeam $inviter, Team $team, BelongsToTeam $invitee, ?array $attributes = null): Invitation;
+    public function invite(Team $team, BelongsToTeam $member, BelongsToTeam $invokedBy, ?array $attributes = null): Invitation;
 }

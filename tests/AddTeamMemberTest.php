@@ -32,7 +32,7 @@ class AddTeamMemberTest extends TestCase
         $role = 'some.role';
         $attributes = ['role' => $role];
 
-        Teams::addTeamMember($owner, $team, $player, $attributes);
+        Teams::addTeamMember($team, $player, $owner, $attributes);
 
         // Team functionality
         $this->assertTrue($team->allMembers()->contains($player));
@@ -84,7 +84,7 @@ class AddTeamMemberTest extends TestCase
         try {
             $this->expectException(ValidationException::class);
 
-            Teams::addTeamMember($owner, $team, $player);
+            Teams::addTeamMember($team, $player, $owner);
         } catch (ValidationException $e) {
             $this->assertArrayHasKey('member', $e->errors());
 
@@ -117,14 +117,14 @@ class AddTeamMemberTest extends TestCase
         $owner = Player::factory()->create();
         $team = Teams::createTeam($owner, 'Test Team');
         $player = Player::factory()->create();
-        Teams::addTeamMember($owner, $team, $player);
+        Teams::addTeamMember($team, $player, $owner);
 
         Event::fake();
 
         try {
             $this->expectException(ValidationException::class);
 
-            Teams::addTeamMember($owner, $team, $player);
+            Teams::addTeamMember($team, $player, $owner);
         } catch (ValidationException $e) {
             $this->assertArrayHasKey('member', $e->errors());
 

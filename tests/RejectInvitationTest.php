@@ -21,7 +21,7 @@ class RejectInvitationTest extends TestCase
         $team = Teams::createTeam($owner, 'Test Team');
         $prospect = Player::factory()->create();
 
-        $invitation = Teams::inviteTeamMember($owner, $team, $prospect);
+        $invitation = Teams::inviteTeamMember($team, $prospect, $owner);
 
         Teams::rejectInvitation($prospect, $invitation);
 
@@ -46,10 +46,10 @@ class RejectInvitationTest extends TestCase
         $owner = Player::factory()->create();
         $team = Teams::createTeam($owner, 'Test Team');
         $nonOwner = Player::factory()->create();
-        Teams::addTeamMember($owner, $team, $nonOwner);
+        Teams::addTeamMember($team, $nonOwner, $owner);
         $prospect = Player::factory()->create();
 
-        $invitation = Teams::inviteTeamMember($owner, $team, $prospect);
+        $invitation = Teams::inviteTeamMember($team, $prospect, $owner);
 
         $this->expectException(AuthorizationException::class);
 
@@ -71,7 +71,7 @@ class RejectInvitationTest extends TestCase
         $team = Teams::createTeam($owner, 'Test Team');
         $prospect = Player::factory()->create();
 
-        $invitation = Teams::inviteTeamMember($owner, $team, $prospect);
+        $invitation = Teams::inviteTeamMember($team, $prospect, $owner);
 
         $this->expectException(AuthorizationException::class);
 
@@ -94,7 +94,7 @@ class RejectInvitationTest extends TestCase
         $nonTeamMember = Player::factory()->create();
         $prospect = Player::factory()->create();
 
-        $invitation = Teams::inviteTeamMember($owner, $team, $prospect);
+        $invitation = Teams::inviteTeamMember($team, $prospect, $owner);
 
         $this->expectException(AuthorizationException::class);
 

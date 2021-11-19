@@ -4,8 +4,6 @@ namespace R4nkt\Teams\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use R4nkt\Teams\Actions\CreateTeam;
-use R4nkt\Teams\Actions\DeleteTeam;
 use R4nkt\Teams\Teams;
 use R4nkt\Teams\TeamsServiceProvider;
 use R4nkt\Teams\Tests\TestClasses\Models\Player;
@@ -25,13 +23,12 @@ class TestCase extends Orchestra
     {
         return [
             TeamsServiceProvider::class,
-            \App\Providers\TeamsServiceProvider::class,
         ];
     }
 
     public function getEnvironmentSetUp($app)
     {
-        config()->set('teams.member_model', Player::class);
+        config()->set('teams.models.member', Player::class);
 
         config()->set('database.default', 'testing');
 

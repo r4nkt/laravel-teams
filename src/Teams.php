@@ -36,7 +36,7 @@ class Teams
     /**
      * The team invitation model that should be used by Teams.
      */
-    public static string $teamInvitationModel = Invitation::class;
+    public static string $invitationModel = Invitation::class;
 
     /**
      * Get the name of the member model used by the application.
@@ -115,9 +115,9 @@ class Teams
     /**
      * Get the name of the team invitation model used by the application.
      */
-    public static function teamInvitationModel(): string
+    public static function invitationModel(): string
     {
-        return static::$teamInvitationModel;
+        return static::$invitationModel;
     }
 
     /**
@@ -125,35 +125,9 @@ class Teams
      */
     public static function useInvitationModel(string $model): self
     {
-        static::$teamInvitationModel = $model;
+        static::$invitationModel = $model;
 
         return new static;
-    }
-
-    /**
-     * Register a class / callback that should be used to accept team invitations.
-     */
-    public static function acceptInvitationsUsing(string $class): void
-    {
-        app()->singleton(AcceptsInvitations::class, $class);
-    }
-
-    public static function acceptInvitation(BelongsToTeam $accepter, Invitation $invitation): void
-    {
-        app(AcceptsInvitations::class)->accept($accepter, $invitation);
-    }
-
-    /**
-     * Register a class / callback that should be used to add team members.
-     */
-    public static function addTeamMembersUsing(string $class): void
-    {
-        app()->singleton(AddsTeamMembers::class, $class);
-    }
-
-    public static function addTeamMember(BelongsToTeam $owner, Team $team, BelongsToTeam $member, array $attributes = []): void
-    {
-        app(AddsTeamMembers::class)->add($owner, $team, $member, $attributes);
     }
 
     /**
@@ -164,10 +138,36 @@ class Teams
         app()->singleton(CreatesTeams::class, $class);
     }
 
-    public static function createTeam(BelongsToTeam $owner, string $name, array $input = []): Team
+    public static function createTeam(BelongsToTeam $invokedBy, string $name, array $input = []): Team
     {
-        return app(CreatesTeams::class)->create($owner, $name, $input);
+        return app(CreatesTeams::class)->create($invokedBy, $name, $input);
     }
+
+    /**
+     * Register a class / callback that should be used to update teams.
+     */
+    // public static function updateTeamsUsing(string $class): void
+    // {
+    //     app()->singleton(UpdatesTeamNames::class, $class);
+    // }
+
+    // public static function updateTeam(Team $team, array $input, BelongsToTeam $invokedBy): Team
+    // {
+    //     return app(UpdatesTeamNames::class)->update($owner, $input, $invokedBy);
+    // }
+
+    /**
+     * Register a class / callback that should be used to transfer teams.
+     */
+    // public static function transferTeamsUsing(string $class): void
+    // {
+    //     app()->singleton(TransfersTeamNames::class, $class);
+    // }
+
+    // public static function transferTeam(Team $team, BelongsToTeam $newOwner, BelongsToTeam $invokedBy): Team
+    // {
+    //     return app(TransfersTeamNames::class)->transfer($team, $newOwner, $invokedBy);
+    // }
 
     /**
      * Register a class / callback that should be used to delete teams.
@@ -177,9 +177,48 @@ class Teams
         app()->singleton(DeletesTeams::class, $class);
     }
 
-    public static function deleteTeam(BelongsToTeam $owner, Team $team)
+    public static function deleteTeam(Team $team, BelongsToTeam $invokedBy)
     {
-        app(DeletesTeams::class)->delete($owner, $team);
+        app(DeletesTeams::class)->delete($team, $invokedBy);
+    }
+
+    /**
+     * Register a class / callback that should be used to add team members.
+     */
+    public static function addTeamMembersUsing(string $class): void
+    {
+        app()->singleton(AddsTeamMembers::class, $class);
+    }
+
+    public static function addTeamMember(Team $team, BelongsToTeam $member, BelongsToTeam $invokedBy, array $attributes = []): void
+    {
+        app(AddsTeamMembers::class)->add($team, $member, $invokedBy, $attributes);
+    }
+
+    // /**
+    //  * Register a class / callback that should be used to update team members.
+    //  */
+    // public static function updateTeamMembersUsing(string $class): void
+    // {
+    //     app()->singleton(UpdatesTeamMembers::class, $class);
+    // }
+
+    // public static function updateTeamMember(Team $team, BelongsToTeam $member, BelongsToTeam $invokedBy, array $attributes): void
+    // {
+    //     app(UpdatesTeamMembers::class)->update($team, $member, $invokedBy, $attributes);
+    // }
+
+    /**
+     * Register a class / callback that should be used to remove team members.
+     */
+    public static function removeTeamMembersUsing(string $class): void
+    {
+        app()->singleton(RemovesTeamMembers::class, $class);
+    }
+
+    public static function removeTeamMember(Team $team, BelongsToTeam $member, BelongsToTeam $invokedBy): void
+    {
+        app(RemovesTeamMembers::class)->remove($team, $member, $invokedBy);
     }
 
     /**
@@ -190,22 +229,22 @@ class Teams
         app()->singleton(InvitesTeamMembers::class, $class);
     }
 
-    public static function inviteTeamMember(BelongsToTeam $inviter, Team $team, BelongsToTeam $invitee, ?array $attributes = null): Invitation
+    public static function inviteTeamMember(Team $team, BelongsToTeam $member, BelongsToTeam $invokedBy, ?array $attributes = null): Invitation
     {
-        return app(InvitesTeamMembers::class)->invite($inviter, $team, $invitee, $attributes);
+        return app(InvitesTeamMembers::class)->invite($team, $member, $invokedBy, $attributes);
     }
 
     /**
-     * Register a class / callback that should be used when team members leave teams.
+     * Register a class / callback that should be used to accept team invitations.
      */
-    public static function leaveTeamsUsing(string $class): void
+    public static function acceptInvitationsUsing(string $class): void
     {
-        app()->singleton(LeavesTeams::class, $class);
+        app()->singleton(AcceptsInvitations::class, $class);
     }
 
-    public static function leaveTeam(BelongsToTeam $member, Team $team): void
+    public static function acceptInvitation(Invitation $invitation, BelongsToTeam $invokedBy): void
     {
-        app(LeavesTeams::class)->leave($member, $team);
+        app(AcceptsInvitations::class)->accept($invitation, $invokedBy);
     }
 
     /**
@@ -216,9 +255,9 @@ class Teams
         app()->singleton(RejectsInvitations::class, $class);
     }
 
-    public static function rejectInvitation(BelongsToTeam $rejecter, Invitation $invitation): void
+    public static function rejectInvitation(BelongsToTeam $invokedBy, Invitation $invitation): void
     {
-        app(RejectsInvitations::class)->reject($rejecter, $invitation);
+        app(RejectsInvitations::class)->reject($invokedBy, $invitation);
     }
 
     /**
@@ -235,23 +274,17 @@ class Teams
     }
 
     /**
-     * Register a class / callback that should be used to remove team members.
+     * Register a class / callback that should be used when team members leave teams.
+     *
+     * @todo This may be superfluous...and can be implemented by (re)using removeTeamMember...allowing certain members to remove themselves.
      */
-    public static function removeTeamMembersUsing(string $class): void
+    public static function leaveTeamsUsing(string $class): void
     {
-        app()->singleton(RemovesTeamMembers::class, $class);
+        app()->singleton(LeavesTeams::class, $class);
     }
 
-    public static function removeTeamMember(Team $team, BelongsToTeam $member, BelongsToTeam $invokedBy): void
+    public static function leaveTeam(BelongsToTeam $member, Team $team): void
     {
-        app(RemovesTeamMembers::class)->remove($team, $member, $invokedBy);
+        app(LeavesTeams::class)->leave($member, $team);
     }
-
-    /**
-     * Register a class / callback that should be used to update teams.
-     */
-    // public static function updateTeamsUsing(string $class): void
-    // {
-    //     app()->singleton(UpdatesTeamNames::class, $class);
-    // }
 }
