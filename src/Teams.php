@@ -242,9 +242,9 @@ class Teams
         app()->singleton(AcceptsInvitations::class, $class);
     }
 
-    public static function acceptInvitation(Invitation $invitation, BelongsToTeam $invokedBy): void
+    public static function acceptInvitation(BelongsToTeam $invokedBy, Invitation $invitation): void
     {
-        app(AcceptsInvitations::class)->accept($invitation, $invokedBy);
+        app(AcceptsInvitations::class)->accept($invokedBy, $invitation);
     }
 
     /**

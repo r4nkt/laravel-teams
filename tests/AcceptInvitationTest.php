@@ -33,7 +33,7 @@ class AcceptInvitationTest extends TestCase
 
         $invitation = Teams::inviteTeamMember($owner, $team, $prospect, $attributes);
 
-        Teams::acceptInvitation($invitation, $prospect);
+        Teams::acceptInvitation($prospect, $invitation);
 
         $team->refresh();
 
@@ -80,7 +80,7 @@ class AcceptInvitationTest extends TestCase
         $this->expectException(AuthorizationException::class);
 
         try {
-            Teams::acceptInvitation($invitation, $nonOwner);
+            Teams::acceptInvitation($nonOwner, $invitation);
         } catch (AuthorizationException $e) {
             $this->assertSame(1, $team->invitations()->count());
             $this->assertSame(1, $prospect->receivedInvitations()->count());
@@ -102,7 +102,7 @@ class AcceptInvitationTest extends TestCase
         $this->expectException(AuthorizationException::class);
 
         try {
-            Teams::acceptInvitation($invitation, $owner);
+            Teams::acceptInvitation($owner, $invitation);
         } catch (AuthorizationException $e) {
             $this->assertSame(1, $team->invitations()->count());
             $this->assertSame(1, $prospect->receivedInvitations()->count());
@@ -125,7 +125,7 @@ class AcceptInvitationTest extends TestCase
         $this->expectException(AuthorizationException::class);
 
         try {
-            Teams::acceptInvitation($invitation, $nonTeamMember);
+            Teams::acceptInvitation($nonTeamMember, $invitation);
         } catch (AuthorizationException $e) {
             $this->assertSame(1, $team->invitations()->count());
             $this->assertSame(1, $prospect->receivedInvitations()->count());
