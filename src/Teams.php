@@ -151,9 +151,9 @@ class Teams
     //     app()->singleton(UpdatesTeamNames::class, $class);
     // }
 
-    // public static function updateTeam(Team $team, array $input, BelongsToTeam $invokedBy): Team
+    // public static function updateTeam(BelongsToTeam $invokedBy, Team $team, array $input): Team
     // {
-    //     return app(UpdatesTeamNames::class)->update($owner, $input, $invokedBy);
+    //     return app(UpdatesTeamNames::class)->update($invokedBy, $owner, $input);
     // }
 
     /**
@@ -164,9 +164,9 @@ class Teams
     //     app()->singleton(TransfersTeamNames::class, $class);
     // }
 
-    // public static function transferTeam(Team $team, BelongsToTeam $newOwner, BelongsToTeam $invokedBy): Team
+    // public static function transferTeam(BelongsToTeam $invokedBy, Team $team, BelongsToTeam $newOwner): Team
     // {
-    //     return app(TransfersTeamNames::class)->transfer($team, $newOwner, $invokedBy);
+    //     return app(TransfersTeamNames::class)->transfer($invokedBy, $team, $newOwner);
     // }
 
     /**
@@ -177,9 +177,9 @@ class Teams
         app()->singleton(DeletesTeams::class, $class);
     }
 
-    public static function deleteTeam(Team $team, BelongsToTeam $invokedBy)
+    public static function deleteTeam(BelongsToTeam $invokedBy, Team $team)
     {
-        app(DeletesTeams::class)->delete($team, $invokedBy);
+        app(DeletesTeams::class)->delete($invokedBy, $team);
     }
 
     /**
